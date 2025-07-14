@@ -1,225 +1,276 @@
-import { View, StyleSheet, Pressable } from "react-native"
-import { Text } from "../common/components/Text"
-import type { EstimateRow, EstimateSection } from "@/data"
-import {
-	calculateSectionTotal,
-	calculateEstimateTotal,
-} from "../common/lib/estimate"
-import { EditForm } from "./EditForm"
-import { useEstimateScreen } from "./useEstimateScreen"
-import { TextField } from "../common/components/TextField"
+import React, { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../common/components/Text';
+import { calculateEstimateTotal, calculateSectionTotal } from '../common/lib/estimate';
+import { EditForm } from './EditForm';
+import { useEstimateScreen } from './useEstimateScreen';
+import { TextField } from '../common/components/TextField';
+import { useThemeTokens } from '../common/theme/useThemeTokens';
+import { AnimatedThemeSwitch } from '../common/components/AnimatedThemeSwitch';
+import { Feather } from '@expo/vector-icons';
+import { AddForm } from './AddForm';
 
-export default function EstimateScreenDesktop() {
-	const {
-		estimate,
-		updateTitle,
-		editMode,
-		handleStartItemEdit,
-		handleStartSectionEdit,
-		handleSaveItem,
-		handleSaveSection,
-		handleStopEdit,
-	} = useEstimateScreen()
+export default function EstimateScreenDesktop(): JSX.Element {
+  const { colors, fonts, numbers, components } = useThemeTokens();
+  const {
+    estimate,
+    updateTitle,
+    editMode,
+    addMode,
+    handleStartItemEdit,
+    handleStartSectionEdit,
+    handleSaveItem,
+    handleSaveSection,
+    handleStopEdit,
+    handleStartItemAdd,
+    handleAddItem,
+    handleDeleteItem,
+    handleDeleteSection,
+  } = useEstimateScreen();
 
-	const renderEditForm = () => {
-		if (!editMode) {
-			return (
-				<View style={styles.noSelection}>
-					<Text>Select an item or section to edit</Text>
-				</View>
-			)
-		}
+  const renderEditForm = (): JSX.Element => {
+    if (!editMode && !addMode) {
+      return (
+        <View style={[styles.noSelection, { backgroundColor: colors.layer.solid.light }]}>
+          <Text style={[fonts.regular.text.md, { color: colors.text.primary }]}>
+            Select an item or section to edit
+          </Text>
+        </View>
+      );
+    }
 
-		return (
-			<EditForm
-				key={editMode.data.id}
-				mode={editMode.type}
-				data={editMode.data}
-				onSave={
-					editMode.type === "item"
-						? handleSaveItem
-						: handleSaveSection
-				}
-				onClose={handleStopEdit}
-			/>
-		)
-	}
+    if (addMode) {
+      return <AddForm mode={addMode.type} onClose={handleStopEdit} onSave={handleAddItem} />;
+    }
 
-	return (
-		<View style={styles.container}>
-			{/* Header */}
-			<View style={styles.header}>
-				<TextField
-					style={styles.titleInput}
-					value={estimate.title}
-					onChangeText={updateTitle}
-					placeholder="Enter estimate title"
-				/>
-			</View>
+    return (
+      <>
+        {editMode && (
+          <EditForm
+            key={editMode?.data.id}
+            mode={editMode.type}
+            data={editMode.data}
+            onSave={editMode.type === 'item' ? handleSaveItem : handleSaveSection}
+            onDelete={editMode.type === 'item' ? handleDeleteItem : handleDeleteSection}
+            onClose={handleStopEdit}
+          />
+        )}
+      </>
+    );
+  };
 
-			{/* Main content */}
-			<View style={styles.content}>
-				{/* Left side - Table */}
-				<View style={styles.tableContainer}>
-					{estimate.sections.map((section) => (
-						<View key={section.id} style={styles.section}>
-							<Pressable
-								style={[
-									styles.sectionHeader,
-									editMode?.type === "section" &&
-										editMode.data.id === section.id &&
-										styles.selectedSection,
-								]}
-								onPress={() => handleStartSectionEdit(section)}
-							>
-								<Text>{section.title}</Text>
-								<Text>
-									${calculateSectionTotal(section).toFixed(2)}
-								</Text>
-							</Pressable>
-							{/* Table rows */}
-							{section.rows.map((row) => (
-								<Pressable
-									key={row.id}
-									style={[
-										styles.tableRow,
-										editMode?.type === "item" &&
-											editMode.data.id === row.id &&
-											styles.selectedRow,
-									]}
-									onPress={() => handleStartItemEdit(row)}
-								>
-									<View style={styles.rowLeftContent}>
-										<Text style={styles.rowTitle}>
-											{row.title}
-										</Text>
-										<View style={styles.rowDetails}>
-											<Text
-												style={styles.rowPriceDetails}
-											>
-												${row.price.toFixed(2)} ×{" "}
-												{row.quantity} {row.uom}
-											</Text>
-										</View>
-									</View>
-									<Text>
-										${(row.price * row.quantity).toFixed(2)}
-									</Text>
-								</Pressable>
-							))}
-						</View>
-					))}
+  return (
+    <View style={[styles.container, { backgroundColor: colors.layer.solid.light }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TextField
+          style={[fonts.bold.headline.sm, styles.titleInput, { color: colors.text.primary }]}
+          value={estimate.title}
+          onChangeText={updateTitle}
+          placeholder="Enter estimate title"
+        />
+        <AnimatedThemeSwitch />
+      </View>
 
-					<View style={styles.estimateTotal}>
-						<Text>Total:</Text>
-						<Text>
-							${calculateEstimateTotal(estimate).toFixed(2)}
-						</Text>
-					</View>
-				</View>
+      {/* Main content */}
+      <View style={styles.content}>
+        {/* Left side - Table */}
+        <View style={styles.tableContainer}>
+          <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+            {estimate.sections.map((section, index) => (
+              <View key={section.id} style={styles.section}>
+                <View
+                  style={[
+                    styles.sectionHeader,
+                    {
+                      backgroundColor: colors.layer.solid.medium,
+                      borderColor: colors.outline.medium,
+                    },
+                    index === 0 && {
+                      borderTopLeftRadius: numbers.borderRadius.lg,
+                      borderTopRightRadius: numbers.borderRadius.lg,
+                    },
+                    editMode?.type === 'group' &&
+                      editMode.data.id === section.id && {
+                        backgroundColor: colors.layer.solid.dark,
+                      },
+                  ]}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: numbers.spacing['2xs'],
+                    }}
+                  >
+                    <Pressable onPress={() => handleStartSectionEdit(section)}>
+                      <Text style={[fonts.bold.text.md, { color: colors.text.primary }]}>
+                        {section.title}
+                      </Text>
+                    </Pressable>
+                    <Pressable onPress={() => handleStartItemAdd(section.id)}>
+                      <View
+                        style={{
+                          width: numbers.sizing.icon.sm * 2,
+                          height: numbers.sizing.icon.sm * 2,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: components.button.background.secondary.idle,
+                          borderRadius: components.button.borderRadius,
+                        }}
+                      >
+                        <Feather name="plus" size={24} color={colors.icon.primary} />
+                      </View>
+                    </Pressable>
+                  </View>
+                  <Text style={[fonts.bold.text.md, { color: colors.text.primary }]}>
+                    ${calculateSectionTotal(section).toFixed(2)}
+                  </Text>
+                </View>
 
-				{/* Right side - Edit form */}
-				<View style={styles.formContainer}>{renderEditForm()}</View>
-			</View>
-		</View>
-	)
+                {/* Table rows */}
+                {section.rows.map((row) => (
+                  <Pressable
+                    key={row.id}
+                    style={[
+                      styles.tableRow,
+                      {
+                        backgroundColor: colors.layer.solid.light,
+                        borderColor: colors.outline.medium,
+                      },
+                      editMode?.type === 'item' &&
+                        editMode.data.id === row.id &&
+                        styles.selectedRow,
+                    ]}
+                    onPress={() => handleStartItemEdit(row)}
+                  >
+                    <View style={styles.rowLeftContent}>
+                      <Text
+                        style={[
+                          styles.rowTitle,
+                          fonts.regular.text.md,
+                          { color: colors.text.primary },
+                        ]}
+                      >
+                        {row.title}
+                      </Text>
+                      <View style={styles.rowDetails}>
+                        <Text style={[fonts.regular.text.sm, { color: colors.text.secondary }]}>
+                          ${row.price.toFixed(2)} × {row.quantity} {row.uom}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={[fonts.bold.text.md, { color: colors.text.primary }]}>
+                      ${(row.price * row.quantity).toFixed(2)}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            ))}
+          </ScrollView>
+
+          <View
+            style={[
+              styles.estimateTotal,
+              { backgroundColor: colors.layer.solid.dark, borderColor: colors.outline.medium },
+            ]}
+          >
+            <Text style={[fonts.bold.text.md, { color: colors.text.primary }]}>Total:</Text>
+            <Text style={[fonts.bold.text.md, { color: colors.text.primary }]}>
+              ${calculateEstimateTotal(estimate).toFixed(2)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Right side - Edit form */}
+        <View style={styles.formContainer}>{renderEditForm()}</View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#f5f5f5",
-	},
-	header: {
-		padding: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: "#e0e0e0",
-		backgroundColor: "#ffffff",
-	},
-	titleInput: {
-		fontSize: 24,
-		fontWeight: "bold",
-		padding: 12,
-		borderRadius: 8,
-		backgroundColor: "#f5f5f5",
-	},
-	content: {
-		flex: 1,
-		flexDirection: "row",
-	},
-	tableContainer: {
-		flex: 2,
-		padding: 16,
-	},
-	formContainer: {
-		flex: 1,
-		borderLeftWidth: 1,
-		borderLeftColor: "#e0e0e0",
-		backgroundColor: "#ffffff",
-		padding: 16,
-	},
-	section: {
-		backgroundColor: "#ffffff",
-		borderRadius: 8,
-		marginBottom: 16,
-		overflow: "hidden",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
-	},
-	selectedSection: {
-		backgroundColor: "#e6f0ff",
-	},
-	sectionHeader: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		padding: 16,
-		backgroundColor: "#f8f8f8",
-		borderBottomWidth: 1,
-		borderBottomColor: "#e0e0e0",
-	},
-	tableRow: {
-		flexDirection: "row",
-		padding: 12,
-		borderBottomWidth: 1,
-		borderBottomColor: "#f0f0f0",
-		cursor: "pointer",
-	},
-	selectedRow: {
-		backgroundColor: "#f0f7ff",
-	},
-	rowLeftContent: {
-		flex: 1,
-		marginRight: 16,
-	},
-	rowTitle: {
-		fontSize: 16,
-		marginBottom: 4,
-	},
-	rowDetails: {
-		opacity: 0.7,
-	},
-	rowPriceDetails: {
-		fontSize: 14,
-	},
-	estimateTotal: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		padding: 16,
-		backgroundColor: "#ffffff",
-		borderRadius: 8,
-		marginTop: 8,
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
-	},
-	noSelection: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-})
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  titleInput: {
+    flex: 1,
+    padding: 12,
+  },
+  content: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  tableContainer: {
+    flex: 2,
+    padding: 16,
+    flexDirection: 'column',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  formContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderWidth: 1,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    padding: 12,
+    borderWidth: 1,
+    cursor: 'pointer',
+  },
+  selectedRow: {
+    backgroundColor: '#f0f7ff',
+  },
+  rowLeftContent: {
+    flex: 1,
+    marginRight: 16,
+  },
+  rowTitle: {
+    marginBottom: 4,
+  },
+  rowDetails: {
+    opacity: 0.7,
+  },
+  rowPriceDetails: {
+    fontSize: 14,
+  },
+  estimateTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  noSelection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

@@ -1,45 +1,41 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Text } from '../common/components/Text';
 import { Button } from '../common/components/Button';
-import { EstimateRow, EstimateSection, UnitOfMeasure } from '@/data';
+import { UnitOfMeasure } from '@/data';
 import { useState } from 'react';
 import { useThemeTokens } from '../common/theme/useThemeTokens';
 import { Feather } from '@expo/vector-icons';
 import { FloatingLabelInput } from '../common/components/FloatingLabelInput';
+import { v4 as uuidv4 } from 'uuid';
 
-type EditFormProps = {
+type AddFormProps = {
   mode: 'item' | 'group';
-  data: EstimateRow | EstimateSection | null;
   onSave: (updates: any) => void;
   onClose: () => void;
-  onDelete: (id: string) => void;
 };
 
-function isEstimateRow(data: any): data is EstimateRow {
-  return 'price' in data && 'quantity' in data && 'uom' in data;
-}
-
-export function EditForm({ mode, data, onSave, onClose, onDelete }: EditFormProps): JSX.Element {
+export function AddForm({ mode, onSave, onClose }: AddFormProps): JSX.Element {
   const { fonts, colors, numbers, components } = useThemeTokens();
 
-  const [title, setTitle] = useState(data?.title || '');
-  const [price, setPrice] = useState(isEstimateRow(data) ? data.price.toString() : '0');
-  const [quantity, setQuantity] = useState(isEstimateRow(data) ? data.quantity.toString() : '0');
-  const [uom, setUom] = useState<UnitOfMeasure>(isEstimateRow(data) ? data.uom : 'EA');
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('0');
+  const [quantity, setQuantity] = useState('0');
+  const [uom, setUom] = useState<UnitOfMeasure>('EA');
 
-  const handleSave = (): void => {
+  const handleAdd = (): void => {
     if (mode === 'item') {
       onSave({
-        ...data,
+        id: uuidv4(),
         title,
         price: parseFloat(price),
         quantity: parseFloat(quantity),
         uom,
       });
     } else {
-      onSave({ title });
+      onSave({ id: uuidv4(), title, rows: [] });
     }
+    onClose();
   };
 
   return (
@@ -52,31 +48,25 @@ export function EditForm({ mode, data, onSave, onClose, onDelete }: EditFormProp
           marginBottom: numbers.spacing.lg,
         }}
       >
-        <Pressable
+        <View
           style={[
             styles.iconWrapper,
             { backgroundColor: components.button.background.secondary.idle },
           ]}
-          onPress={onClose}
-          accessibilityLabel="Cancel"
         >
-          <Feather name="x" size={24} color={colors.icon.primary} />
-        </Pressable>
+          <Text onPress={onClose} accessibilityLabel="Cancel">
+            <Feather name="x" size={24} color={colors.icon.primary} />
+          </Text>
+        </View>
         <Text style={[fonts.bold.text.md, { color: colors.text.primary }]}>
-          {mode === 'item' ? 'Edit item' : 'Edit group'}
+          {mode === 'item' ? 'Add item' : 'Add group'}
         </Text>
-        <Pressable
-          style={[styles.iconWrapper, { backgroundColor: colors.layer.solid.light }]}
-          onPress={() => onDelete(data?.id || '')}
-          accessibilityLabel="Delete"
-        >
-          <Feather name="trash-2" size={24} color={colors.icon.primary} />
-        </Pressable>
+        <View style={[styles.iconWrapper]} />
       </View>
 
       <View style={styles.field}>
         <FloatingLabelInput
-          label={`${mode === 'item' ? 'Item' : 'Group'} title`}
+          label={`${mode === 'item' ? 'Item title' : 'Group title'}`}
           value={title}
           onChangeText={setTitle}
           placeholder={`Enter ${mode} title`}
@@ -134,8 +124,8 @@ export function EditForm({ mode, data, onSave, onClose, onDelete }: EditFormProp
       )}
 
       <View style={styles.formActions}>
-        <Button onPress={handleSave} style={styles.button}>
-          Save changes
+        <Button onPress={handleAdd} style={styles.button}>
+          Save {mode}
         </Button>
       </View>
     </View>
