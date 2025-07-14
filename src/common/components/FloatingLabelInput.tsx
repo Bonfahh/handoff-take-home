@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   qtyBtn: {
-    borderRadius: 22,
+    borderRadius: numbersAliasTokens.borderRadius['2xl'],
     alignItems: 'center',
     justifyContent: 'center',
   },

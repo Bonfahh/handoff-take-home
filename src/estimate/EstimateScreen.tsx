@@ -13,6 +13,7 @@ import Feather from '@expo/vector-icons/build/Feather';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AddForm } from './AddForm';
 import { SwipeableRow } from '../common/components/SwipeableRow';
+import { numbersAliasTokens } from '../common/theme/tokens/alias/numbers';
 
 export default function EstimateScreen(): JSX.Element {
   const bottomSheetRef = useRef<BottomSheetRef>(null);
@@ -100,7 +101,7 @@ export default function EstimateScreen(): JSX.Element {
           placeholder="Enter estimate title"
         />
         {estimate.sections.map((section) => (
-          <View key={section.id} style={[styles.section]}>
+          <View key={section.id}>
             <View style={[styles.sectionHeader, { borderColor: colors.outline.medium }]}>
               <View
                 style={{ flexDirection: 'row', alignItems: 'center', gap: numbers.spacing['2xs'] }}
@@ -201,40 +202,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleInput: {
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
     borderBottomWidth: 1,
   },
-  section: {},
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
     borderBottomWidth: 1,
   },
   row: {
     flexDirection: 'row',
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
     borderBottomWidth: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   rowLeftContent: {
     flex: 1,
-    marginRight: 16,
-  },
-  rowTitle: {
-    fontSize: 16,
-    marginBottom: 4,
-    fontWeight: '500',
-  },
-  rowPriceDetails: {
-    fontSize: 14,
+    marginRight: numbersAliasTokens.spacing.sm,
   },
   estimateTotal: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
-    marginTop: 8,
+    padding: numbersAliasTokens.spacing.sm,
+    marginTop: numbersAliasTokens.spacing['2xs'],
   },
 });

@@ -8,6 +8,7 @@ import { useThemeTokens } from '../common/theme/useThemeTokens';
 import { AnimatedThemeSwitch } from '../common/components/AnimatedThemeSwitch';
 import { Feather } from '@expo/vector-icons';
 import { AddForm } from './AddForm';
+import { numbersAliasTokens } from '../common/theme/tokens/alias/numbers';
 
 export default function EstimateScreenDesktop(): JSX.Element {
   const { colors, fonts, numbers, components } = useThemeTokens();
@@ -197,11 +198,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
   },
   titleInput: {
     flex: 1,
-    padding: 12,
+    padding: numbersAliasTokens.spacing.xs,
   },
   content: {
     flex: 1,
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
   },
   tableContainer: {
     flex: 2,
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
     flexDirection: 'column',
   },
   scrollView: {
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
   },
   section: {
     overflow: 'hidden',
@@ -230,12 +231,12 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: numbersAliasTokens.spacing.sm,
     borderWidth: 1,
   },
   tableRow: {
     flexDirection: 'row',
-    padding: 12,
+    padding: numbersAliasTokens.spacing.xs,
     borderWidth: 1,
     cursor: 'pointer',
   },
@@ -244,23 +245,20 @@ const styles = StyleSheet.create({
   },
   rowLeftContent: {
     flex: 1,
-    marginRight: 16,
+    marginRight: numbersAliasTokens.spacing.sm,
   },
   rowTitle: {
-    marginBottom: 4,
+    marginBottom: numbersAliasTokens.spacing['3xs'],
   },
   rowDetails: {
     opacity: 0.7,
   },
-  rowPriceDetails: {
-    fontSize: 14,
-  },
   estimateTotal: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+    padding: numbersAliasTokens.spacing.sm,
+    borderBottomLeftRadius: numbersAliasTokens.borderRadius.sm,
+    borderBottomRightRadius: numbersAliasTokens.borderRadius.sm,
     borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

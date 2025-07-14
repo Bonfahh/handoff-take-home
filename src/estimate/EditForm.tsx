@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useThemeTokens } from '../common/theme/useThemeTokens';
 import { Feather } from '@expo/vector-icons';
 import { FloatingLabelInput } from '../common/components/FloatingLabelInput';
+import { numbersAliasTokens } from '../common/theme/tokens/alias/numbers';
 
 type EditFormProps = {
   mode: 'item' | 'group';
@@ -144,35 +145,28 @@ export function EditForm({ mode, data, onSave, onClose, onDelete }: EditFormProp
 
 const styles = StyleSheet.create({
   container: {
-    margin: 16,
+    margin: numbersAliasTokens.spacing.sm,
   },
   header: {
-    marginBottom: 16,
+    marginBottom: numbersAliasTokens.spacing.sm,
   },
   field: {
-    marginBottom: 16,
+    marginBottom: numbersAliasTokens.spacing.sm,
     width: '100%',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    marginTop: 4,
   },
   formActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 8,
-    marginTop: 24,
+    gap: numbersAliasTokens.spacing['2xs'],
+    marginTop: numbersAliasTokens.spacing.lg,
   },
   button: {
     minWidth: 100,
   },
   iconWrapper: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: numbersAliasTokens.sizing.icon.lg * 2,
+    height: numbersAliasTokens.sizing.icon.lg * 2,
+    borderRadius: numbersAliasTokens.borderRadius['2xl'],
     alignItems: 'center',
     justifyContent: 'center',
   },
