@@ -83,26 +83,29 @@ export function EstimateProvider({ children }: PropsWithChildren): JSX.Element {
     setEditMode(null);
   }, []);
 
-  const addItem = useCallback((item: EstimateRow): void => {
-    if (addMode?.type !== 'item') {
-      return;
-    }
+  const addItem = useCallback(
+    (item: EstimateRow): void => {
+      if (addMode?.type !== 'item') {
+        return;
+      }
 
-    setEstimate((prev) => ({
-      ...prev,
-      updatedAt: new Date(),
-      sections: prev.sections.map((section) => {
-        if (section.id === addMode.sectionId) {
-          return {
-            ...section,
-            rows: [item, ...section.rows],
-          };
-        }
-        return section;
-      }),
-    }));
-    setAddMode(null);
-  }, []);
+      setEstimate((prev) => ({
+        ...prev,
+        updatedAt: new Date(),
+        sections: prev.sections.map((section) => {
+          if (section.id === addMode.sectionId) {
+            return {
+              ...section,
+              rows: [item, ...section.rows],
+            };
+          }
+          return section;
+        }),
+      }));
+      setAddMode(null);
+    },
+    [addMode],
+  );
 
   const deleteItem = useCallback((rowId: string): void => {
     setEstimate((prev) => ({
