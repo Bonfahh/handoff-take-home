@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import type { Estimate, EstimateRow, EstimateSection } from '@/data';
 import { PropsWithChildren, useState } from 'react';
 import { sampleEstimate } from '@/data';
@@ -49,26 +49,29 @@ export function EstimateProvider({ children }: PropsWithChildren): JSX.Element {
   const [editMode, setEditMode] = useState<EditMode>(null);
   const [addMode, setAddMode] = useState<AddMode>(null);
 
-  const updateTitle = (title: string): void => {
+  const updateTitle = useCallback((title: string): void => {
     setEstimate((prev) => ({
       ...prev,
       title,
       updatedAt: new Date(),
     }));
-  };
+  }, []);
 
-  const updateSection = (sectionId: string, updateSection: Partial<EstimateSection>): void => {
-    setEstimate((prev) => ({
-      ...prev,
-      updatedAt: new Date(),
-      sections: prev.sections.map((section) =>
-        section.id === sectionId ? { ...section, ...updateSection } : section,
-      ),
-    }));
-    setEditMode(null);
-  };
+  const updateSection = useCallback(
+    (sectionId: string, updateSection: Partial<EstimateSection>): void => {
+      setEstimate((prev) => ({
+        ...prev,
+        updatedAt: new Date(),
+        sections: prev.sections.map((section) =>
+          section.id === sectionId ? { ...section, ...updateSection } : section,
+        ),
+      }));
+      setEditMode(null);
+    },
+    [],
+  );
 
-  const updateItem = (rowId: string, updateItem: Partial<EstimateRow>): void => {
+  const updateItem = useCallback((rowId: string, updateItem: Partial<EstimateRow>): void => {
     setEstimate((prev) => ({
       ...prev,
       updatedAt: new Date(),
@@ -78,9 +81,9 @@ export function EstimateProvider({ children }: PropsWithChildren): JSX.Element {
       })),
     }));
     setEditMode(null);
-  };
+  }, []);
 
-  const addItem = (item: EstimateRow): void => {
+  const addItem = useCallback((item: EstimateRow): void => {
     if (addMode?.type !== 'item') {
       return;
     }
@@ -99,9 +102,9 @@ export function EstimateProvider({ children }: PropsWithChildren): JSX.Element {
       }),
     }));
     setAddMode(null);
-  };
+  }, []);
 
-  const deleteItem = (rowId: string): void => {
+  const deleteItem = useCallback((rowId: string): void => {
     setEstimate((prev) => ({
       ...prev,
       updatedAt: new Date(),
@@ -111,46 +114,46 @@ export function EstimateProvider({ children }: PropsWithChildren): JSX.Element {
       })),
     }));
     setEditMode(null);
-  };
+  }, []);
 
-  const addSection = (section: EstimateSection): void => {
+  const addSection = useCallback((section: EstimateSection): void => {
     setEstimate((prev) => ({
       ...prev,
       updatedAt: new Date(),
       sections: [section, ...prev.sections],
     }));
     setAddMode(null);
-  };
+  }, []);
 
-  const deleteSection = (sectionId: string): void => {
+  const deleteSection = useCallback((sectionId: string): void => {
     setEstimate((prev) => ({
       ...prev,
       updatedAt: new Date(),
       sections: prev.sections.filter((section) => section.id !== sectionId),
     }));
     setEditMode(null);
-  };
+  }, []);
 
-  const selectItem = (item: EstimateRow): void => {
+  const selectItem = useCallback((item: EstimateRow): void => {
     setEditMode({ type: 'item', data: item });
-  };
+  }, []);
 
-  const selectAddItem = (sectionId: string): void => {
+  const selectAddItem = useCallback((sectionId: string): void => {
     setAddMode({ type: 'item', sectionId });
-  };
+  }, []);
 
-  const selectSection = (section: EstimateSection): void => {
+  const selectSection = useCallback((section: EstimateSection): void => {
     setEditMode({ type: 'group', data: section });
-  };
+  }, []);
 
-  const selectAddSection = (): void => {
+  const selectAddSection = useCallback((): void => {
     setAddMode({ type: 'group' });
-  };
+  }, []);
 
-  const clearSelection = (): void => {
+  const clearSelection = useCallback((): void => {
     setEditMode(null);
     setAddMode(null);
-  };
+  }, []);
 
   const value = useMemo(
     () => ({

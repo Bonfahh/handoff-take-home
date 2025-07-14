@@ -13,7 +13,7 @@ export const Button = forwardRef<View, PropsWithChildren<ButtonProps>>(function 
   ref,
 ) {
   const [hovered, setHovered] = useState(false);
-  const { colors, fonts, numbers, components } = useThemeTokens();
+  const { colors, fonts, components } = useThemeTokens();
 
   const variants = {
     primary: {
