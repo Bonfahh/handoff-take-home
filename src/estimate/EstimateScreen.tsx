@@ -12,6 +12,7 @@ import { useThemeTokens } from '../common/theme/useThemeTokens';
 import Feather from '@expo/vector-icons/build/Feather';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AddForm } from './AddForm';
+import { SwipeableRow } from '../common/components/SwipeableRow';
 
 export default function EstimateScreen(): JSX.Element {
   const bottomSheetRef = useRef<BottomSheetRef>(null);
@@ -129,13 +130,14 @@ export default function EstimateScreen(): JSX.Element {
               </Text>
             </View>
             {section.rows.map((row) => (
-              <Pressable
+              <SwipeableRow
                 key={row.id}
                 style={[
                   styles.row,
                   { borderColor: colors.outline.medium, backgroundColor: colors.layer.solid.light },
                 ]}
                 onPress={() => handleItemPress(row)}
+                onDelete={() => handleDeleteItem(row.id)}
               >
                 <View style={styles.rowLeftContent}>
                   <Text style={[fonts.regular.text.md, { color: colors.text.primary }]}>
@@ -148,7 +150,7 @@ export default function EstimateScreen(): JSX.Element {
                 <Text style={[fonts.regular.text.md, { color: colors.text.primary }]}>
                   ${(row.price * row.quantity).toFixed(2)}
                 </Text>
-              </Pressable>
+              </SwipeableRow>
             ))}
           </View>
         ))}
